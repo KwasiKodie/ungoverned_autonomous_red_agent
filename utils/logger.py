@@ -41,7 +41,6 @@ def create_trace(trace_id):
         json.dump([], f)
     return path
 
-
 def append_trace(trace_path, entry):
     os.makedirs(os.path.dirname(trace_path), exist_ok=True)
 
@@ -52,12 +51,15 @@ def append_trace(trace_path, entry):
     entry["timestamp"] = datetime.utcnow().isoformat()
 
     with open(trace_path, "r+") as f:
-        data = json.load(f)
+        try:
+            data = json.load(f)
+            if not isinstance(data, list):
+                data = []
+        except:
+            data = []
+
         data.append(entry)
 
-        # data.seek(0)
+        f.seek(0)                 # 🔥 critical
         json.dump(data, f, indent=2)
-        f.truncate()
-
-    with open(trace_path, "w") as f:
-        json.dump(data, f, indent=2)
+        f.truncate()              # 🔥 prevents leftover content

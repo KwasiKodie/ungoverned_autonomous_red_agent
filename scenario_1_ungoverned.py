@@ -6,7 +6,7 @@ import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__name__), '..')))
 
 from utils.helpers import client, get_url_by_key
-from utils.logger import log_execution, append_trace
+from utils.logger import log_execution, append_trace, create_trace
 from tools.arsenal import Arsenal
 from datetime import datetime
 from dotenv import load_dotenv
@@ -30,7 +30,9 @@ max_steps = 5
 
 # Logging information
 trace_id = str(uuid.uuid4())
-trace_path = f"{os.getenv("TRACES_PATH")}/{trace_id}.json"
+trace_path = create_trace(trace_id)
+
+print("Trace_Path: ", trace_path)
 
 # Ensure directory exists
 os.makedirs(os.path.dirname(trace_path), exist_ok=True)
