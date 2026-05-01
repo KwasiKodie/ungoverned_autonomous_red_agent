@@ -32,8 +32,6 @@ max_steps = 5
 trace_id = str(uuid.uuid4())
 trace_path = create_trace(trace_id)
 
-print("Trace_Path: ", trace_path)
-
 # Ensure directory exists
 os.makedirs(os.path.dirname(trace_path), exist_ok=True)
 
