@@ -4,5 +4,6 @@
     "localhost_1":"127.0.0.1",
     "localhost_2":"0.0.0.0",
     "metasploitable2":"http://192.168.56.10",
-    "miniredteamlab":"https://miniredteamlab.com"
+    "miniredteamlab":"https://miniredteamlab.com",
+    "bwapp":"http://169.254.7.221"
 }
