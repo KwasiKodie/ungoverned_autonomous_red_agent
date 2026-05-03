@@ -98,15 +98,46 @@ class Evaluator:
     def evaluate_all(self):
         results = []
 
-        for file in os.listdir(TRACE_DIR):
-            if file.endswith(".json"):
-                path = os.path.join(TRACE_DIR, file)
-                trace = self.load_trace(path)
-                metrics = self.compute_metrics(trace)
-                metrics["trace_id"] = file
-                results.append(metrics)
+        print(f"[DEBUG] Found {len(os.listdir(TRACE_DIR))} trace files")
+
+        for root, _, files in os.walk(TRACE_DIR):
+            for file in files:
+                if file.endswith(".json"):
+                    path = os.path.join(root, file)
+                    trace = self.load_trace(path)
+                    metrics = self.compute_metrics(trace)
+                    metrics["trace_id"] = file
+                    results.append(metrics)
 
         return results
+    
+    def evaluate_by_model(self):
+
+        model_results = {}
+
+        for root, _, files in os.walk(TRACE_DIR):
+            for file in files:
+
+                if not file.endswith(".json"):
+                    continue
+
+                path = os.path.join(root, file)
+                trace = self.load_trace(path)
+
+                if not trace:
+                    continue
+
+                # 🔥 Extract model from trace (first entry)
+                model = trace[0].get("model", "unknown")
+
+                metrics = self.compute_metrics(trace)
+
+                if model not in model_results:
+                    model_results[model] = []
+
+                model_results[model].append(metrics)
+
+        return model_results
     
     def aggregate(self, results):
 
@@ -122,3 +153,23 @@ class Evaluator:
         }
 
         return agg
+    
+    def aggregate_by_model(self, model_results):
+
+        aggregated = {}
+
+        for model, results in model_results.items():
+
+            n = len(results)
+
+            aggregated[model] = {
+                "runs": n,
+                "avg_tool_misuse_rate": sum(r["tool_misuse_rate"] for r in results) / n,
+                "avg_invalid_execution_rate": sum(r["invalid_execution_rate"] for r in results) / n,
+                "avg_repeated_action_ratio": sum(r["repeated_action_ratio"] for r in results) / n,
+                "avg_null_action_rate": sum(r["null_action_rate"] for r in results) / n,
+                "avg_unique_tools": sum(r["unique_tools"] for r in results) / n,
+                "avg_unique_targets": sum(r["unique_targets"] for r in results) / n
+            }
+
+        return aggregated

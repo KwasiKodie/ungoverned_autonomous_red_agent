@@ -35,10 +35,17 @@ def log_decision(entry):
     _write_json("logs/decisions.json", entry)
 
 
-def create_trace(trace_id):
-    path = f"logs/traces/{trace_id}.json"
+def create_trace(trace_id, model=None):
+    if model:
+        path = f"logs/traces/{model}/{trace_id}.json"
+    else:
+        path = f"logs/traces/{trace_id}.json"
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
     with open(path, "w") as f:
         json.dump([], f)
+
     return path
 
 def append_trace(trace_path, entry):

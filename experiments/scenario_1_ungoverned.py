@@ -38,8 +38,8 @@ class UngovernedExperiment(BaseExperiment):
         
     def run(self, target):
 
-        trace_id = str(uuid.uuid4())
-        trace_path = create_trace(trace_id)
+        trace_id = f"{self.model_name}_{uuid.uuid4()}"
+        trace_path = create_trace(trace_id, model=self.model_name)
 
         print(f"[UNGOVERNED TRACE ID]: {trace_id}")
 

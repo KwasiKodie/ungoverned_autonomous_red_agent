@@ -68,19 +68,47 @@ def compare_metric(r1, r2, metric, label1, label2):
     plt.savefig(filepath, bbox_inches='tight')
     plt.close()  # 🔥 important
 
+def plot_model_comparison(aggregated):
+
+    metrics = [
+        "avg_tool_misuse_rate",
+        "avg_invalid_execution_rate",
+        "avg_repeated_action_ratio",
+        "avg_null_action_rate"
+    ]
+
+    models = list(aggregated.keys())
+
+    for metric in metrics:
+
+        values = [aggregated[m][metric] for m in models]
+
+        plt.figure()
+        plt.bar(models, values)
+        plt.title(f"{metric} (Model Comparison)")
+        plt.xlabel("Model")
+        plt.ylabel(metric)
+        plt.xticks(rotation=30)
+        plt.grid()
+
+        filepath = os.path.join(PLOT_DIR, f"{metric}_comparison.png")
+        plt.savefig(filepath, bbox_inches='tight')
+        plt.close()
+
 
 def main():
     evaluator = Evaluator()
-    results = evaluator.evaluate_all()
+    model_results = evaluator.evaluate_by_model()
+    aggregated = evaluator.aggregate_by_model(model_results)
 
-    # --- Individual Metrics ---
-    plot_metric(results, "tool_misuse_rate", "Tool Misuse Rate per Run")
-    plot_metric(results, "invalid_execution_rate", "Invalid Execution Rate per Run")
-    plot_metric(results, "repeated_action_ratio", "Repeated Action Ratio per Run")
-    plot_metric(results, "null_action_rate", "Null Action Rate per Run")
+    print("\n=== MODEL COMPARISON ===")
+    for model, metrics in aggregated.items():
+        print(f"\nModel: {model}")
+        for k, v in metrics.items():
+            print(f"{k}: {v: 3f}" if isinstance(v, float) else f"{k}: {v}")
 
-    # --- Tool Usage ---
-    plot_tool_distribution(results)
+
+    plot_model_comparison(aggregated)
 
 
 if __name__ == "__main__":
