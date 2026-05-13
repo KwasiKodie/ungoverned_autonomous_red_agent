@@ -1,4 +1,5 @@
 import importlib
+import time
 from utils.helpers import get_url_by_key
 from config.experiment_config import EXPERIMENTS, TARGETS, RUNS
 from experiments.plot_results import main as plot_main
@@ -49,6 +50,8 @@ def run_experiment_for_model(model_name):
             result = experiment.run(target)
 
             print("[RESULT]:", result)
+
+            time.sleep(5)
 
 
 def main():

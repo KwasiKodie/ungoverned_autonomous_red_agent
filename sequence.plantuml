@@ -1,0 +1,91 @@
+@startuml AutonomousRedAgent
+
+skinparam classAttributeIconSize 0
+
+class BaseExperiment {
+  +run(target)
+}
+
+class UngovernedExperiment {
+  -max_steps
+  -tools
+  -client
+  -provider
+  -model_name
+  +run(target)
+  +extract_value(text, key)
+}
+
+BaseExperiment <|-- UngovernedExperiment
+
+class ModelClient {
+  +generate(prompt)
+}
+
+class OpenAIClient {
+  -client
+  -model
+  +generate(prompt)
+}
+
+class ClaudeClient {
+  -client
+  -model
+  +generate(prompt)
+}
+
+ModelClient <|-- OpenAIClient
+ModelClient <|-- ClaudeClient
+
+UngovernedExperiment --> ModelClient
+
+class Arsenal {
+  +exploit
+  +recon
+}
+
+class ExploitTools {
+  +sqlmap_dump_target(target)
+  +commix_request(options)
+  +metasploit_exploit(module, target)
+  +curl_custom_request(method, url)
+}
+
+class ReconTools {
+  +nuclei_scan(target, options)
+  +curl_request(url)
+  +gobuster_scan(url, wordlist)
+  +shodan_search(query)
+}
+
+UngovernedExperiment --> Arsenal
+Arsenal --> ExploitTools
+Arsenal --> ReconTools
+
+class ExperimentLogger {
+  +create_trace(trace_id)
+  +append_trace(path, entry)
+  +log_execution(entry)
+}
+
+UngovernedExperiment --> ExperimentLogger
+
+class Evaluator {
+  +evaluate_all()
+  +evaluate_by_model()
+  +compute_metrics(trace)
+  +aggregate_by_model(results)
+}
+
+Evaluator --> ExperimentLogger
+
+class MainRunner {
+  +main()
+  +run_experiment_for_model(model)
+  +load_experiment(class_name)
+}
+
+MainRunner --> UngovernedExperiment
+MainRunner --> Evaluator
+
+@enduml

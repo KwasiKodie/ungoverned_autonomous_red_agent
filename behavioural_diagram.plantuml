@@ -1,0 +1,42 @@
+@startuml AutonomousAgentSequence
+
+actor User
+
+participant MainRunner
+participant UngovernedExperiment
+participant ModelClient
+participant Arsenal
+participant ExploitTools
+participant ReconTools
+participant ExperimentLogger
+participant Evaluator
+
+User -> MainRunner : start()
+MainRunner -> UngovernedExperiment : run(target)
+
+loop for each step
+
+    UngovernedExperiment -> ModelClient : generate(prompt)
+    ModelClient --> UngovernedExperiment : decision (ACTION, TARGET, PARAMETERS)
+
+    alt SQLMAP / COMMIX / METASPLOIT / CURL
+        UngovernedExperiment -> Arsenal : exploit.*
+        Arsenal -> ExploitTools : execute(tool, params)
+        ExploitTools --> UngovernedExperiment : result
+    else NUCLEI
+        UngovernedExperiment -> Arsenal : recon.*
+        Arsenal -> ReconTools : nuclei_scan()
+        ReconTools --> UngovernedExperiment : result
+    end
+
+    UngovernedExperiment -> ExperimentLogger : append_trace()
+    UngovernedExperiment -> ExperimentLogger : log_execution()
+
+end
+
+UngovernedExperiment --> MainRunner : result
+
+MainRunner -> Evaluator : evaluate_by_model()
+Evaluator --> MainRunner : metrics
+
+@enduml

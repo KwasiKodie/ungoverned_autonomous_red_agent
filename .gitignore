@@ -8,10 +8,6 @@ __pycache__/
 .venv/
 env/
 
-# Logs
-logs/
-*.log
-
 # State / runtime data
 state/state.json
 
